@@ -1,0 +1,9 @@
+[project]
+name = "django-otp-auth"
+version = "0.1.0"
+description = "Reusable Django OTP Authentication"
+dependencies = [
+    "django>=5.0",
+    "djangorestframework>=3.14",
+    "dj-rest-auth>=5.0",
+]

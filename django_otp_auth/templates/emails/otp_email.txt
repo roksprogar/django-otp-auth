@@ -1,0 +1,11 @@
+Sign in to {{ project_name }}
+
+Hello,
+
+Use the following code to complete your sign-in process. This code is valid for 5 minutes.
+
+Code: {{ otp }}
+
+If you didn't request this code, you can safely ignore this email.
+
+This is an automated message, please do not reply.
