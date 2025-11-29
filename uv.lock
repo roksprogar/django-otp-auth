@@ -48,7 +48,7 @@ wheels = [
 ]
 
 [[package]]
-name = "django-otp-auth"
+name = "django-otp-email-auth"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
