@@ -25,6 +25,12 @@ dependencies = [
 [project.urls]
 Repository = "https://github.com/roksprogar/django-otp-auth"
 
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-django>=4.0.0",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
