@@ -1,0 +1,11 @@
+services:
+  app-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    volumes:
+      - .:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=tests.settings
+      - PYTHONPATH=.
+    command: pytest
