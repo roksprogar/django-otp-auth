@@ -1,4 +1,5 @@
 import secrets
+import string
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password, check_password
 from django.core.cache import cache
@@ -40,9 +41,11 @@ class RequestOTPView(APIView):
         if not email:
             return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Generate 6-digit secure OTP
-        otp = ''.join([str(secrets.SystemRandom().randrange(10)) for _ in range(6)])
+        # Generate 6-character alphanumeric OTP
+        alphabet = string.ascii_uppercase + string.digits
+        otp = ''.join(secrets.choice(alphabet) for _ in range(6))
         
+
         # Store hashed OTP in cache with 5-minute expiry
         cache_key = f'otp_{email}'
         cache.set(cache_key, make_password(otp), timeout=300)
