@@ -200,3 +200,25 @@ To run tests locally using `uv`:
 ```bash
 uv run pytest
 ```
+
+### Running Checks
+
+To run linting checks (ruff) using Docker:
+
+```bash
+make lint
+```
+
+### Pre-commit Hooks
+
+To automatically run checks before every commit, install the pre-commit hooks:
+
+```bash
+uv run pre-commit install
+```
+
+You can also run the hooks manually against all files:
+
+```bash
+uv run pre-commit run --all-files
+```
