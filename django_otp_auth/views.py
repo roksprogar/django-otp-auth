@@ -41,14 +41,24 @@ class RequestOTPView(APIView):
         if not email:
             return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Generate 6-character alphanumeric OTP
-        alphabet = string.ascii_uppercase + string.digits
-        otp = ''.join(secrets.choice(alphabet) for _ in range(6))
+        # Check if local auth is disabled (Magic OTP)
+        disable_local_auth = getattr(settings, 'OTP_AUTH_DISABLE_LOCAL_AUTH', False)
+        
+        if disable_local_auth:
+            otp = '000000'
+        else:
+            # Generate 6-character alphanumeric OTP
+            alphabet = string.ascii_uppercase + string.digits
+            otp = ''.join(secrets.choice(alphabet) for _ in range(6))
         
 
         # Store hashed OTP in cache with 5-minute expiry
         cache_key = f'otp_{email}'
         cache.set(cache_key, make_password(otp), timeout=300)
+
+        if disable_local_auth:
+            # Skip sending email
+            return Response({'message': 'OTP sent successfully'})
 
         # Render email content
         context = {

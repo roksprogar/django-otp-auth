@@ -96,6 +96,23 @@ DEFAULT_FROM_EMAIL = 'Your App <noreply@example.com>'
 | Setting | Description | Default |
 |---------|-------------|---------|
 | `OTP_AUTH_PROJECT_NAME` | Project name used in emails | `'Lifetivation'` |
+| `OTP_AUTH_DISABLE_LOCAL_AUTH` | Enable "Magic OTP" flow (skips email, accepts `000000`) | `False` |
+
+## Local Development (Magic OTP)
+
+To simplify local development and testing, you can enable the "Magic OTP" flow. This allows you to log in as **any user** using the fixed OTP code `000000`, without sending actual emails with the OTP.
+
+1.  Configure the setting in your `settings.py` to read from an environment variable:
+    ```python
+    # Using django-environ
+    OTP_AUTH_DISABLE_LOCAL_AUTH = env.bool("OTP_AUTH_DISABLE_LOCAL_AUTH", default=False)
+    ```
+2.  Set `OTP_AUTH_DISABLE_LOCAL_AUTH=True` in your **local** `.env` file.
+3.  Request an OTP for any email (e.g., `test@example.com`).
+4.  Verify using the code `000000`.
+
+> [!WARNING]
+> **Security Risk**: Ensure this environment variable is **NEVER** set to `True` in production environments.
 
 ## Usage
 
