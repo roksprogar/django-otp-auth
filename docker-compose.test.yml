@@ -4,8 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile.test
     volumes:
-      - .:/app
+      - ./django_otp_auth:/app/django_otp_auth
+      - ./tests:/app/tests
     environment:
       - DJANGO_SETTINGS_MODULE=tests.settings
       - PYTHONPATH=.
-    command: pytest

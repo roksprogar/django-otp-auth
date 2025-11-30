@@ -1,11 +1,11 @@
 import pytest
-from django.urls import path
+
 from django.core import mail
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework import status
-from django_otp_auth.views import RequestOTPView, VerifyOTPView
+
 
 User = get_user_model()
 

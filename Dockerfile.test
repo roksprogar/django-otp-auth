@@ -1,19 +1,23 @@
-FROM python:3.11-slim
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
 
-# Install python dependencies
+# Copy dependency files
 COPY pyproject.toml README.md ./
-RUN pip install --no-cache-dir .
-RUN pip install --no-cache-dir pytest pytest-django djangorestframework-simplejwt
 
+# Install dependencies
+# We don't have a lock file yet, so we just sync.
+# In a real scenario with a lock file, we would use --frozen.
+RUN uv sync --no-install-project
 
 # Copy source code
 COPY . .
 
-CMD ["pytest"]
+# Install the project itself
+RUN uv sync
+
+# Command to run tests
+CMD ["uv", "run", "pytest"]

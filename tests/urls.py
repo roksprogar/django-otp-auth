@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from django_otp_auth.views import RequestOTPView, VerifyOTPView
 
 urlpatterns = [

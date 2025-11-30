@@ -13,7 +13,7 @@ from rest_framework.throttling import ScopedRateThrottle
 from dj_rest_auth.views import LoginView
 
 from .services import send_email
-from .serializers import OTPLoginSerializer
+
 
 User = get_user_model()
 
