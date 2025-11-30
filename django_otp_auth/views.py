@@ -17,19 +17,20 @@ from .services import send_email
 
 User = get_user_model()
 
+
 class RequestOTPView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
-    throttle_scope = 'otp_request'
-    
+    throttle_scope = "otp_request"
+
     # Configurable attributes
     subject = None
     project_name = None
-    
+
     def get_project_name(self):
         if self.project_name:
             return self.project_name
-        return getattr(settings, 'OTP_AUTH_PROJECT_NAME', 'Lifetivation')
+        return getattr(settings, "OTP_AUTH_PROJECT_NAME", "Lifetivation")
 
     def get_subject(self):
         if self.subject:
@@ -37,36 +38,34 @@ class RequestOTPView(APIView):
         return f"Sign in to {self.get_project_name()}"
 
     def post(self, request):
-        email = request.data.get('email')
+        email = request.data.get("email")
         if not email:
-            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Check if local auth is disabled (Magic OTP)
-        disable_local_auth = getattr(settings, 'OTP_AUTH_DISABLE_LOCAL_AUTH', False)
-        
+        disable_local_auth = getattr(settings, "OTP_AUTH_DISABLE_LOCAL_AUTH", False)
+
         if disable_local_auth:
-            otp = '000000'
+            otp = "000000"
         else:
             # Generate 6-character alphanumeric OTP
             alphabet = string.ascii_uppercase + string.digits
-            otp = ''.join(secrets.choice(alphabet) for _ in range(6))
-        
+            otp = "".join(secrets.choice(alphabet) for _ in range(6))
 
         # Store hashed OTP in cache with 5-minute expiry
-        cache_key = f'otp_{email}'
+        cache_key = f"otp_{email}"
         cache.set(cache_key, make_password(otp), timeout=300)
 
         if disable_local_auth:
             # Skip sending email
-            return Response({'message': 'OTP sent successfully'})
+            return Response({"message": "OTP sent successfully"})
 
         # Render email content
-        context = {
-            'otp': otp,
-            'project_name': self.get_project_name()
-        }
-        html_message = render_to_string('emails/otp_email.html', context)
-        plain_message = render_to_string('emails/otp_email.txt', context)
+        context = {"otp": otp, "project_name": self.get_project_name()}
+        html_message = render_to_string("emails/otp_email.html", context)
+        plain_message = render_to_string("emails/otp_email.txt", context)
 
         # Send OTP via email
         send_email(
@@ -77,31 +76,31 @@ class RequestOTPView(APIView):
             fail_silently=False,
         )
 
-        return Response({'message': 'OTP sent successfully'})
+        return Response({"message": "OTP sent successfully"})
+
 
 class VerifyOTPView(LoginView):
     permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
-    throttle_scope = 'otp_verify'
-    
+    throttle_scope = "otp_verify"
+
     def post(self, request):
-        email = request.data.get('email')
-        otp = request.data.get('otp')
+        email = request.data.get("email")
+        otp = request.data.get("otp")
 
         if not email or not otp:
             return Response(
-                {'error': 'Email and OTP are required'}, 
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "Email and OTP are required"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         # Verify OTP
-        cache_key = f'otp_{email}'
+        cache_key = f"otp_{email}"
         stored_otp_hash = cache.get(cache_key)
 
         if not stored_otp_hash or not check_password(otp, stored_otp_hash):
             return Response(
-                {'error': 'Invalid OTP'}, 
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         # Clear the OTP from cache
@@ -109,6 +108,6 @@ class VerifyOTPView(LoginView):
 
         # We have overriden a serializer and used jwt in REST_AUTH settings.
         response = super().post(request)
-        if 'refresh' in response.data:
-            response.data.pop('refresh')
+        if "refresh" in response.data:
+            response.data.pop("refresh")
         return response
