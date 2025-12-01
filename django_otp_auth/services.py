@@ -1,10 +1,15 @@
+from typing import List
 from django.conf import settings
 from django.core.mail import send_mail
 
 
 def send_email(
-    subject, message, recipient_list, fail_silently=False, html_message=None
-):
+    subject: str,
+    message: str,
+    recipient_list: List[str],
+    fail_silently: bool = False,
+    html_message: str | None = None,
+) -> int:
     """
     Send an email using the configured email backend.
     """

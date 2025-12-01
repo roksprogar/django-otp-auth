@@ -1,5 +1,6 @@
 import secrets
 import string
+from typing import Any
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password, check_password
 from django.core.cache import cache
@@ -9,6 +10,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.throttling import ScopedRateThrottle
 from dj_rest_auth.views import LoginView
 
@@ -24,20 +26,20 @@ class RequestOTPView(APIView):
     throttle_scope = "otp_request"
 
     # Configurable attributes
-    subject = None
-    project_name = None
+    subject: str | None = None
+    project_name: str | None = None
 
-    def get_project_name(self):
+    def get_project_name(self) -> str:
         if self.project_name:
             return self.project_name
         return getattr(settings, "OTP_AUTH_PROJECT_NAME", "Lifetivation")
 
-    def get_subject(self):
+    def get_subject(self) -> str:
         if self.subject:
             return self.subject
         return f"Sign in to {self.get_project_name()}"
 
-    def post(self, request):
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         email = request.data.get("email")
         if not email:
             return Response(
@@ -84,7 +86,7 @@ class VerifyOTPView(LoginView):
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "otp_verify"
 
-    def post(self, request):
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         email = request.data.get("email")
         otp = request.data.get("otp")
 
@@ -107,7 +109,7 @@ class VerifyOTPView(LoginView):
         cache.delete(cache_key)
 
         # We have overriden a serializer and used jwt in REST_AUTH settings.
-        response = super().post(request)
+        response = super().post(request, *args, **kwargs)
         if "refresh" in response.data:
             response.data.pop("refresh")
         return response
